@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import dao.ClienteDAO;
 import model.Cliente;
 
-@WebServlet("/Cliente")
+@WebServlet("/cliente")
 public class ClienteController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     private ClienteDAO clienteDAO = new ClienteDAO();

@@ -15,6 +15,7 @@
 	<%@include file='Menu.jsp' %>
 	
 	<div class="container body-content mt-4">
+		<%@include file='ClienteSelecionado.jsp' %>
 		<div class="accordion">
 		    <div class="card mt-4">
 		        <div class="card-header bg-primary text-white">
