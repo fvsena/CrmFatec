@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import dao.ClienteDAO;
 import model.Cliente;
 
-@WebServlet("/cliente")
+@WebServlet("/Cliente")
 public class ClienteController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
     private ClienteDAO clienteDAO = new ClienteDAO();
@@ -37,9 +37,12 @@ public class ClienteController extends HttpServlet {
 			Date dataNascto = new SimpleDateFormat("yyyy-MM-dd").parse(dataNascimento);
 			cliente.setDataNascimento(dataNascto);
 			clienteDAO.gravarCliente(cliente);
+			request.getSession().setAttribute("cliente", cliente);
+			request.getSession().setAttribute("idCliente", cliente.getCodigo());
+			request.getSession().setAttribute("nomeCliente", cliente.getNome());
 		} catch (ParseException e) {
 			e.printStackTrace();
-		}  
+		}
 		doGet(request, response);
 	}
 

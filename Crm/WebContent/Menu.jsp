@@ -8,7 +8,8 @@
 
         <div class="collapse navbar-collapse" id="menu">
             <ul class="navbar-nav">
-            <li class="nav-item"><a href="#" class="navbar-brand">Cliente</a></li>
+            <li class="nav-item"><a href="Cliente" class="navbar-brand">Cliente</a></li>
+            <li class="nav-item"><a href="Endereco" class="navbar-brand">Endereço</a></li>
             <li class="nav-item"><a href="#" class="navbar-brand">Contato</a></li>
             <li class="nav-item"><a href="#" class="navbar-brand">Ocorrência</a></li>
             <li class="nav-item"><a href="#" class="navbar-brand">Tipo Ocorrência</a></li>

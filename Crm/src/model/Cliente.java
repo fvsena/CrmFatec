@@ -1,13 +1,14 @@
 package model;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Cliente {
-	private int codigo;
-	private String nome;
-	private String documento;
-	private Date dataNascimento;
-	private String genero;
+	private int codigo = 0;
+	private String nome = "";
+	private String documento = "";
+	private Date dataNascimento = null;
+	private String genero = "";
 	
 	public int getCodigo() {
 		return codigo;

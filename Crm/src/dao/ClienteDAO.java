@@ -34,6 +34,7 @@ public class ClienteDAO {
                     System.out.println(erro);
                 }
 			}
+			statement.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

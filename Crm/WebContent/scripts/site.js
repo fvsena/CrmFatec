@@ -1,4 +1,5 @@
-﻿$('#Endereco_CEP').blur(function () {
+﻿$('#cep').blur(function () {
+	console.log("Metodo acionado");
     value = this.value;
     $.ajax({
         type: "GET",
@@ -6,9 +7,18 @@
         context: document.body,
         contentType: "application/json; charset=utf-8"
     }).done(function (data) {
-        $("#Endereco_Logradouro").val(data.logradouro);
-        $("#Endereco_Bairro").val(data.bairro);
-        $("#Endereco_Cidade").val(data.localidade);
-        $("#Endereco_UF").val(data.uf);
+        $("#logradouro").val(data.logradouro);
+        $("#bairro").val(data.bairro);
+        $("#cidade").val(data.localidade);
+        $("#uf").val(data.uf);
     })
+});
+
+$('#fone').mask('0000-00009');
+$('#fone').blur(function(event) {
+   if($(this).val().length == 10){
+      $('#fone').mask('00000-0009');
+   } else {
+      $('#fone').mask('0000-00009');
+   }
 });

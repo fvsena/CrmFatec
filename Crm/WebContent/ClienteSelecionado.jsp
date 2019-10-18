@@ -1,11 +1,11 @@
 <% 
-String id = "123";
+String id = "";
 if(session.getAttribute("idCliente") != null){
 	id = session.getAttribute("idCliente").toString();
 }
-String nome = "fulano";
+String nome = "";
 if(session.getAttribute("nomeCliente") != null){
-	id = session.getAttribute("nomeCliente").toString();
+	nome = session.getAttribute("nomeCliente").toString();
 }
 %>
 
@@ -22,8 +22,8 @@ if(session.getAttribute("nomeCliente") != null){
 			</thead>
 			<tbody>
 				<tr>
-					<td><input type="text" class="form-control" id="codigoSelecionado" value="<%=id%>" /></td>
-					<td><input type="text" class="form-control" id="nomeSelecionado" value="<%=nome%>" /></td>
+					<td><input type="text" class="form-control" id="codigoSelecionado" value="<%=id%>" disabled/></td>
+					<td><input type="text" class="form-control" id="nomeSelecionado" value="<%=nome%>" disabled/></td>
 					<td><input type="button" class="btn btn-warning" id="acaoSelecionado" value="Remover Seleção" /></td>
 				</tr>
 			</tbody>

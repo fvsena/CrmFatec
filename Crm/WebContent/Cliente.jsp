@@ -1,3 +1,10 @@
+<%@page import="model.Cliente"%>
+<% 
+Cliente cliente = new Cliente();
+if(session.getAttribute("cliente") != null){
+	cliente = (Cliente)session.getAttribute("cliente");
+}
+%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -27,17 +34,17 @@
 		                <div class="form-row p-2">
 		                    <div class="form-group col-md-12">
 		                        <label for="nome">Nome do cliente</label>
-		                        <input type="text" name="nome" id="nome" class="form-control mw-100" placeholder="Nome do cliente" />
+		                        <input type="text" name="nome" id="nome" class="form-control mw-100" placeholder="Nome do cliente" value="<%=cliente.getNome()%>" />
 		                    </div>
 		                </div>
 		                <div class="form-row p-2">
 		                    <div class="form-group col-md-2">
 		                        <label for="documento">Número do documento</label>
-		                        <input type="text" name="documento" id="documento" class="form-control mw-100" placeholder="Documento" />
+		                        <input type="text" name="documento" id="documento" class="form-control mw-100" placeholder="Documento" value="<%=cliente.getDocumento() %>" />
 		                    </div>
 		                    <div class="form-group col-md-2">
 		                        <label for="dataNascimento">Data de nascimento</label>
-		                        <input type="date" name="dataNascimento" id="dataNascimento" class="form-control mw-100" placeholder="Nascimento" />
+		                        <input type="date" name="dataNascimento" id="dataNascimento" class="form-control mw-100" placeholder="Nascimento" value="<%=cliente.getDataNascimento() %>" />
 		                    </div>
 		                    <div class="form-group col-md-2">
 		                        <label for="genero">Gênero</label>
