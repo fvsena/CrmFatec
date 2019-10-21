@@ -465,7 +465,8 @@ CREATE PROCEDURE sp_ValidarLogin
 AS
 BEGIN
 	SELECT
-		IdAgent
+		IdAgent,
+		Name
 	FROM
 		Agent WITH (NOLOCK)
 	WHERE

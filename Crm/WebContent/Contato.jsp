@@ -30,8 +30,8 @@
 		        	<form method="POST" action="Contato">
 		                <div class="form-row">
 		                    <div class="form-group col-12">
-		                        <label for="Detalhe">Detalhe do contato:</label>
-		                        <textarea name="Detalhe" id="Detalhe" class="form-control mw-100"></textarea>
+		                        <label for="detalhe">Detalhe do contato:</label>
+		                        <textarea name="detalhe" id="detalhe" class="form-control mw-100"></textarea>
 		                    </div>
 		                </div>
 		                <div class="form-row">
