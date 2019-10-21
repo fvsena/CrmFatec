@@ -4,6 +4,8 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import dao.ConnectionManager;
 import model.Cliente;
@@ -41,4 +43,45 @@ public class ClienteDAO {
 		return c;
 	}
 	
+	public List<Cliente> obterClientes(){
+		Cliente c;
+		List<Cliente> clientes = new ArrayList<Cliente>();
+		try {
+			Connection conn = ConnectionManager.getInstance().getConnection();
+			CallableStatement statement = conn.prepareCall("sp_ObterClientes");
+			ResultSet rs = statement.executeQuery();
+			while(rs.next()) {
+				c = new Cliente();
+				c.setCodigo(rs.getInt("Codigo"));
+				c.setNome(rs.getString("Nome"));
+				c.setGenero(rs.getString("Genero"));
+				c.setDocumento(rs.getString("Documento"));
+				c.setDataNascimento(rs.getDate("DataNascimento"));
+				clientes.add(c);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return clientes;
+	}
+	
+	public Cliente obterCliente(int codigoCliente){
+		Cliente c = new Cliente();
+		try {
+			Connection conn = ConnectionManager.getInstance().getConnection();
+			CallableStatement statement = conn.prepareCall("sp_ObterCliente ?");
+			statement.setInt(1, codigoCliente);
+			ResultSet rs = statement.executeQuery();
+			while(rs.next()) {
+				c.setCodigo(rs.getInt("Codigo"));
+				c.setNome(rs.getString("Nome"));
+				c.setGenero(rs.getString("Genero"));
+				c.setDocumento(rs.getString("Documento"));
+				c.setDataNascimento(rs.getDate("DataNascimento"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return c;
+	}
 }

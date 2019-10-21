@@ -26,7 +26,7 @@ public class LoginController extends HttpServlet {
 		usuario = usuarioDAO.validarLogin(new Usuario(login, senha));
 		if (usuario.isValido()) {
 			request.getSession().setAttribute("usuario", usuario);
-			response.sendRedirect("Cliente.jsp");
+			response.sendRedirect("ListaClientes.jsp");
 		}
 		else
 		{
