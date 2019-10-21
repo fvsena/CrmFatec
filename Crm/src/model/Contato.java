@@ -22,6 +22,14 @@ public class Contato {
 		this.nomeAgente = nomeAgente;
 	}
 	
+	public int getCodigo() {
+		return codigo;
+	}
+	public void setCodigo(int codigo) {
+		this.codigo = codigo;
+	}
+
+	private int codigo;
 	private Date dataContato;
 	private String nomeAgente;
 	private String detalhe;
