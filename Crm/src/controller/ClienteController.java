@@ -40,6 +40,7 @@ public class ClienteController extends HttpServlet {
 			request.getSession().setAttribute("cliente", cliente);
 			request.getSession().setAttribute("idCliente", cliente.getCodigo());
 			request.getSession().setAttribute("nomeCliente", cliente.getNome());
+			
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}

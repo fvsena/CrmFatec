@@ -29,16 +29,21 @@ public class EnderecoController extends HttpServlet {
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		endereco = new Endereco();
-		endereco.setCep(request.getParameter("cep"));
-		endereco.setLogradouro(request.getParameter("logradouro"));
-		endereco.setNumero(request.getParameter("numero"));
-		endereco.setComplemento(request.getParameter("complemento"));
-		endereco.setBairro(request.getParameter("bairro"));
-		endereco.setCidade(request.getParameter("cidade"));
-		endereco.setUf(request.getParameter("uf"));
-		enderecoDAO.gravarEndereco((int)request.getSession().getAttribute("idCliente"), endereco);
-		request.getSession().setAttribute("endereco", endereco);
+		try {
+			endereco = new Endereco();
+			endereco.setCep(request.getParameter("cep"));
+			endereco.setLogradouro(request.getParameter("logradouro"));
+			endereco.setNumero(request.getParameter("numero"));
+			endereco.setComplemento(request.getParameter("complemento"));
+			endereco.setBairro(request.getParameter("bairro"));
+			endereco.setCidade(request.getParameter("cidade"));
+			endereco.setUf(request.getParameter("uf"));
+			enderecoDAO.gravarEndereco((int)request.getSession().getAttribute("idCliente"), endereco);
+			request.getSession().setAttribute("endereco", endereco);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		doGet(request, response);
 	}
 

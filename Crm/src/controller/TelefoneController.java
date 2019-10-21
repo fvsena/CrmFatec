@@ -1,6 +1,8 @@
 package controller;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -27,11 +29,16 @@ public class TelefoneController extends HttpServlet {
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		telefone = new Telefone();
-		telefone.setDdd(request.getParameter("ddd"));
-		telefone.setFone(request.getParameter("fone"));
-		telefoneDAO.gravarTelefone((int)request.getSession().getAttribute("idCliente"), telefone);
-		request.getSession().setAttribute("telefone", telefone);
+		try {
+			telefone = new Telefone();
+			telefone.setDdd(request.getParameter("ddd"));
+			telefone.setFone(request.getParameter("fone"));
+			telefoneDAO.gravarTelefone((int)request.getSession().getAttribute("idCliente"), telefone);
+			request.getSession().setAttribute("telefone", telefone);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		doGet(request, response);
 	}
 
