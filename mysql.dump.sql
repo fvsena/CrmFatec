@@ -157,6 +157,27 @@ CREATE TABLE Scheduling (
 
 -- Procedures
 
+DELIMITER $$
+ -- AINDA NÃO FOI TESTADO
+CREATE PROCEDURE saveCustomer(
+        _name VARCHAR(100),
+        _gender CHAR(1),
+        _document VARCHAR(20),
+        _birthDate DATETIME,
+        _id INT
+    )
+BEGIN
+    IF _id = null THEN
+        INSERT INTO Customer
+            ( Name, Gender, DocumentNumber, BirthDate, CustomerDate)
+            VALUES
+            (_name,_gender,_document,_birthDate,now());
+    ELSE
+        UPDATE Customer SET Name = _name, Gender = _gender, DocumentNumber = _document, 
+        BirthDate = _birthDate, CustomerDate = now() where IdCustomer = _id;
+    END IF;
+END$$
+DELIMITER ;
 -- GO
 -- CREATE PROCEDURE sp_GravarCliente
 -- 	(
