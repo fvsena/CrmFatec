@@ -8,7 +8,7 @@ public class ConnectionManager {
 	private static ConnectionManager instance;
 	private Connection conn;
 	//private final String csCrmJava = "jdbc:sqlserver://localhost:1433;instance=sqlexpress;databaseName=CrmJava;";
-	private final String csCrmJava = "jdbc:sqlserver://localhost\\SQLEXPRESS:1433;databaseName=CrmJava;integratedSecurity=true;";
+	private final String csCrmJava = "jdbc:sqlserver://SENA-LAPTOP\\SQLEXPRESS:1433;databaseName=Crm;integratedSecurity=true;";
 	
 	private ConnectionManager() {
 		try {

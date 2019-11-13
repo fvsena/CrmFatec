@@ -32,7 +32,7 @@ else {
 		
 		<div class="card">
 		    <div class="card-body">
-		        <a href="CadastroCliente.jsp" class="btn btn-primary">Cadastrar Cliente</a>
+		        <a href="Cliente.jsp" class="btn btn-primary">Cadastrar Cliente</a>
 		    </div>
 		</div>
 		

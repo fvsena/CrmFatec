@@ -9,24 +9,27 @@ if(session.getAttribute("nomeCliente") != null){
 }
 %>
 
+
 <div class="card">
 	<div class="card-header bg-primary text-white">
 		Cliente Selecionado
 	</div>
 	<div class="card-body">
-		<table class="table border-0">
-			<thead>
-				<th scope="col">Código</th>
-				<th scope="col">Nome</th>
-				<th scope="col">Ação</th>
-			</thead>
-			<tbody>
-				<tr>
-					<td><input type="text" class="form-control" id="codigoSelecionado" value="<%=id%>" disabled/></td>
-					<td><input type="text" class="form-control" id="nomeSelecionado" value="<%=nome%>" disabled/></td>
-					<td><input type="button" class="btn btn-warning" id="acaoSelecionado" value="Remover Seleção" /></td>
-				</tr>
-			</tbody>
-		</table>
+		<form method="POST" action="ClienteSelecionado">
+			<table class="table border-0">
+				<thead>
+					<th scope="col">Código</th>
+					<th scope="col">Nome</th>
+					<th scope="col">Ação</th>
+				</thead>
+				<tbody>
+					<tr>
+						<td><input type="text" class="form-control" id="codigoSelecionado" value="<%=id%>" disabled/></td>
+						<td><input type="text" class="form-control" id="nomeSelecionado" value="<%=nome%>" disabled/></td>
+						<td><input type="submit" class="btn btn-warning" id="acaoSelecionado" value="Remover Seleção" /></td>
+					</tr>
+				</tbody>
+			</table>
+		</form>
 	</div>
 </div>
