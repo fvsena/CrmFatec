@@ -8,10 +8,14 @@ public class ConnectionManager {
 	private static ConnectionManager instance;
 	private Connection conn;
 	//private final String csCrmJava = "jdbc:sqlserver://localhost:1433;instance=sqlexpress;databaseName=CrmJava;";
+<<<<<<< HEAD
 	//private final String csCrmJava = "jdbc:sqlserver://localhost\\SQLEXPRESS:1433;databaseName=CrmJava;integratedSecurity=true;";
 	private final String csCrmJava = "jdbc:mysql://localhost/crm";
 	private final String user = "root";
 	private final String pass = "admin";
+=======
+	private final String csCrmJava = "jdbc:sqlserver://SENA-LAPTOP\\SQLEXPRESS:1433;databaseName=Crm;integratedSecurity=true;";
+>>>>>>> af292cef985b4c0b88b85e0db3d2860d47949b5e
 	
 	private ConnectionManager() {
 		try {
