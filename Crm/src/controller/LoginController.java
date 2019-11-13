@@ -30,7 +30,7 @@ public class LoginController extends HttpServlet {
 		}
 		else
 		{
-			response.getOutputStream().write("<script>alert('Usu·rio e/ou senha incorretos!');</script>".getBytes());
+			response.getOutputStream().write("<script>alert('Usu√°rio e/ou senha incorretos!');</script>".getBytes());
 			response.sendRedirect("Login.jsp");
 		}
 	}

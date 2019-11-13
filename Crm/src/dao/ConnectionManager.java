@@ -8,11 +8,15 @@ public class ConnectionManager {
 	private static ConnectionManager instance;
 	private Connection conn;
 	//private final String csCrmJava = "jdbc:sqlserver://localhost:1433;instance=sqlexpress;databaseName=CrmJava;";
-	private final String csCrmJava = "jdbc:sqlserver://localhost\\SQLEXPRESS:1433;databaseName=CrmJava;integratedSecurity=true;";
+	//private final String csCrmJava = "jdbc:sqlserver://localhost\\SQLEXPRESS:1433;databaseName=CrmJava;integratedSecurity=true;";
+	private final String csCrmJava = "jdbc:mysql://localhost/crm";
+	private final String user = "root";
+	private final String pass = "admin";
 	
 	private ConnectionManager() {
 		try {
-			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+			//Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+			Class.forName("com.mysql.jdbc.Driver");
 			System.out.println("Driver Carregado");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -28,10 +32,10 @@ public class ConnectionManager {
 
 	public Connection getConnection() throws SQLException {
 		if (conn == null || conn.isClosed()) {
-			conn = DriverManager.getConnection(csCrmJava);
-			System.out.println("Gerada uma nova conex„o");
+			conn = DriverManager.getConnection(csCrmJava, user, pass);
+			System.out.println("Gerada uma nova conex√£o");
 		} else {
-			System.out.println("Reusando uma conex„o existente");
+			System.out.println("Reusando uma conex√£o existente");
 		}
 		return conn;
 	}
