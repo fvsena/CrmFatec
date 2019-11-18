@@ -163,11 +163,11 @@ CREATE PROCEDURE saveCustomer(
         _name VARCHAR(100),
         _gender CHAR(1),
         _document VARCHAR(20),
-        _birthDate DATETIME,
+        _birthDate DATE,
         _id INT
     )
 BEGIN
-    IF _id = null THEN
+    IF _id  IS NULL THEN
         INSERT INTO Customer
             ( Name, Gender, DocumentNumber, BirthDate, CustomerDate)
             VALUES
