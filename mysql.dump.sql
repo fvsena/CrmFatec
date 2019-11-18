@@ -203,6 +203,19 @@ BEGIN
     SELECT IdAgent, Name FROM Agent WHERE login = _login AND password = _password;
 END$$
 
+DELIMITER $$
+CREATE PROCEDURE getCustomers()
+BEGIN
+	SELECT
+		IdCustomer Codigo,
+		Name Nome,
+		Gender Genero,
+		DocumentNumber Documento,
+		BirthDate DataNascimento
+	FROM
+		Customer;
+END$$
+
 DELIMITER ;
 -- CREATE PROCEDURE sp_GravarEndereco
 -- 	(
