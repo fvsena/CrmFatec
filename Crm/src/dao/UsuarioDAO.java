@@ -9,7 +9,7 @@ import model.Usuario;
 public class UsuarioDAO {
 	public Usuario validarLogin(Usuario u) {
 		if (u.getLogin() != null && !u.getLogin().isEmpty()) {
-			String sql = "sp_ValidarLogin ?, ?";
+			String sql = "call sp_ValidarLogin (?, ?)";
 			try {
 				Connection conn = ConnectionManager.getInstance().getConnection();
 				PreparedStatement statement = conn.prepareStatement(sql);

@@ -10,7 +10,7 @@ import model.Endereco;
 
 public class EnderecoDAO {
 	public Endereco gravarEndereco(int codigoCliente, Endereco e) {
-		String sql = "sp_GravarEndereco ?, ?, ?, ?, ?, ?, ?, ?";
+		String sql = "call sp_GravarEndereco (?, ?, ?, ?, ?, ?, ?, ?)";
 		try {
 			Connection conn = ConnectionManager.getInstance().getConnection();
 			PreparedStatement statement = conn.prepareStatement(sql);

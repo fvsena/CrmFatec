@@ -12,7 +12,7 @@ import model.Contato;
 
 public class ContatoDAO {
 	public Contato gravarContato(int codigoCliente, int codigoAgente, Contato c) {
-		String sql = "sp_GravarContato ?, ?, ?";
+		String sql = "call sp_GravarContato (?, ?, ?)";
 		try {
 			Connection conn = ConnectionManager.getInstance().getConnection();
 			PreparedStatement statement = conn.prepareStatement(sql);
@@ -45,7 +45,7 @@ public class ContatoDAO {
 		List<Contato> contatos = new ArrayList<Contato>();
 		try {
 			Connection conn = ConnectionManager.getInstance().getConnection();
-			CallableStatement statement = conn.prepareCall("sp_ObterContatos ?");
+			CallableStatement statement = conn.prepareCall("call sp_ObterContatos (?)");
 			statement.setInt(1, codigoCliente);
 			ResultSet rs = statement.executeQuery();
 			while(rs.next()) {
