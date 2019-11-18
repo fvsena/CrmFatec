@@ -177,6 +177,9 @@ BEGIN
         BirthDate = _birthDate, CustomerDate = now() where IdCustomer = _id;
     END IF;
 END$$
+
+
+
 DELIMITER ;
 -- GO
 -- CREATE PROCEDURE sp_GravarCliente
