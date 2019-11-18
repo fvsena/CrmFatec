@@ -8,7 +8,7 @@ import model.Telefone;
 
 public class TelefoneDAO {
 	public Telefone gravarTelefone(int codigoCliente, Telefone t) {
-		String sql = "sp_GravarTelefone ?, ?";
+		String sql = "call sp_GravarTelefone (?, ?)";
 		try {
 			Connection conn = ConnectionManager.getInstance().getConnection();
 			PreparedStatement statement = conn.prepareStatement(sql);
