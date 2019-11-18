@@ -158,7 +158,6 @@ CREATE TABLE Scheduling (
 -- Procedures
 
 DELIMITER $$
- -- AINDA NÃO FOI TESTADO
 CREATE PROCEDURE saveCustomer(
         _name VARCHAR(100),
         _gender CHAR(1),
@@ -178,67 +177,33 @@ BEGIN
     END IF;
 END$$
 
+-- CREATE PROCEDURE saveAddress (
+--     idCustomer INT,
+--     cep VARCHAR(20),
+--     street VARCHAR(255),
+--     number VARCHAR(20),
+--     neighborhood VARCHAR(20),
+--     complement VARCHAR(200),
+--     city VARCHAR(100),
+--     state CHAR(2)
+-- )
+-- BEGIN 
+--     IF _id IS NULL THEN
 
+--     ELSE
+
+
+-- END$$
+
+CREATE PROCEDURE validateLogin (
+    _login varchar(20),
+    _password VARCHAR(20)
+)
+BEGIN
+    SELECT IdAgent, Name FROM Agent WHERE login = _login AND password = _password;
+END$$
 
 DELIMITER ;
--- GO
--- CREATE PROCEDURE sp_GravarCliente
--- 	(
--- 		@Nome VARCHAR(100),
--- 		@Genero CHAR(1),
--- 		@Documento VARCHAR(20),
--- 		@DataNascimento DATETIME,
--- 		@IdCliente INT = NULL
--- 	)
--- AS
--- BEGIN
--- 	BEGIN TRANSACTION
--- 	BEGIN TRY
--- 		IF @IdCliente IS NOT NULL
--- 			BEGIN
--- 				UPDATE
--- 					Customer
--- 				SET
--- 					Name = @Nome,
--- 					Gender = @Genero,
--- 					DocumentNumber = @Documento,
--- 					BirthDate = @DataNascimento
--- 				OUTPUT
--- 					inserted.IdCustomer
--- 				WHERE
--- 					IdCustomer = @IdCliente
--- 			END
--- 		ELSE
--- 			BEGIN
--- 				INSERT INTO Customer
--- 				(
--- 					Name,
--- 					Gender,
--- 					DocumentNumber,
--- 					BirthDate,
--- 					CustomerDate
--- 				)
--- 				OUTPUT
--- 					inserted.IdCustomer
--- 				VALUES
--- 				(
--- 					@Nome,
--- 					@Genero,
--- 					@Documento,
--- 					@DataNascimento,
--- 					GETDATE()
--- 				)
--- 			END
-		
--- 		COMMIT TRANSACTION
--- 	END TRY
--- 	BEGIN CATCH
--- 		ROLLBACK TRANSACTION
--- 		SELECT
--- 			ERROR_MESSAGE() AS ErrorMessage
--- 	END CATCH
--- END
--- GO
 -- CREATE PROCEDURE sp_GravarEndereco
 -- 	(
 -- 		@IdCliente INT,
@@ -454,23 +419,6 @@ DELIMITER ;
 -- 		Address WITH (NOLOCK)
 -- 	WHERE
 -- 		IdCustomer = @IdCliente
--- END
--- GO
--- CREATE PROCEDURE sp_ValidarLogin
--- 	(
--- 		@Login VARCHAR(20),
--- 		@Senha VARCHAR(20)
--- 	)
--- AS
--- BEGIN
--- 	SELECT
--- 		IdAgent,
--- 		Name
--- 	FROM
--- 		Agent WITH (NOLOCK)
--- 	WHERE
--- 		Login = @Login
--- 		AND Password = @Senha
 -- END
 -- GO
 -- CREATE PROCEDURE sp_ObterGrupoOcorrencia
