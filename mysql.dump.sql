@@ -177,23 +177,54 @@ BEGIN
     END IF;
 END$$
 
--- CREATE PROCEDURE saveAddress (
---     idCustomer INT,
---     cep VARCHAR(20),
---     street VARCHAR(255),
---     number VARCHAR(20),
---     neighborhood VARCHAR(20),
---     complement VARCHAR(200),
---     city VARCHAR(100),
---     state CHAR(2)
--- )
--- BEGIN 
---     IF _id IS NULL THEN
-
---     ELSE
-
-
--- END$$
+CREATE PROCEDURE saveAddress (
+    _idCustomer INT,
+    _postalCode VARCHAR(20),
+    _publicPlace VARCHAR(255),
+    _number VARCHAR(20),
+    _neighborhood VARCHAR(20),
+    _complement VARCHAR(200),
+    _city VARCHAR(100),
+    _state CHAR(2)
+)
+BEGIN
+    DECLARE total INT;
+    SELECT COUNT(IdAddress) INTO total FROM Address WHERE IdCustomer = _idCustomer;
+    IF total > 0 THEN
+        UPDATE Address SET
+            postalCode = _postalCode,
+            publicPlace = _publicPlace,
+            number = _number,
+            neighborhood = _neighborhood,
+            complement = _complement,
+            city = _city,
+            FS = _state,
+            AddressDate = Now()
+        WHERE idCustomer = _idCustomer;
+    ELSE
+        INSERT INTO Address (
+                    idCustomer,
+                    postalCode,
+                    publicPlace,
+                    number,
+                    neighborhood,
+                    complement,
+                    city,
+                    FS,
+                    AddressDate) 
+                VALUES (
+                    _idCustomer,
+                    _postalCode,
+                    _publicPlace,
+                    _number,
+                    _neighborhood,
+                    _complement,
+                    _city,
+                    _state,
+                    NOW()
+                );
+    END IF;
+END$$
 
 CREATE PROCEDURE validateLogin (
     _login varchar(20),
