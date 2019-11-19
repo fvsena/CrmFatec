@@ -312,6 +312,15 @@ BEGIN
 		IdCustomer = _IdCliente;
 END$$
 
+CREATE PROCEDURE getGroupOcorrence()
+BEGIN
+	SELECT
+		Name AS Grupo,
+		IdSubjectGroup AS IdGrupo
+	FROM
+		SubjectGroup;
+END$$
+
 DELIMITER ;
 
 -- CREATE PROCEDURE sp_GravarTelefone
