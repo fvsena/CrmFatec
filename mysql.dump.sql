@@ -247,110 +247,22 @@ BEGIN
 		Customer;
 END$$
 
+CREATE PROCEDURE saveContact
+	(
+		_IdCliente INT,
+		_IdAgente INT,
+		_Detalhe TEXT
+	)
+BEGIN
+    INSERT INTO Contact
+        (IdCustomer, IdAgent, ContactDate, Detail)
+    VALUES
+        (_IdCliente, _IdAgente, NOW(), _Detalhe);
+END$$
+
 DELIMITER ;
--- CREATE PROCEDURE sp_GravarEndereco
--- 	(
--- 		@IdCliente INT,
--- 		@Cep VARCHAR(20),
--- 		@Logradouro VARCHAR(200),
--- 		@Numero VARCHAR(20),
--- 		@Bairro VARCHAR(100),
--- 		@Complemento VARCHAR(200) = NULL,
--- 		@Cidade VARCHAR(100),
--- 		@Uf CHAR(2)
--- 	)
--- AS
--- BEGIN
--- 	BEGIN TRANSACTION
--- 	BEGIN TRY
 
--- 	DECLARE @CONT INT
--- 	SELECT @CONT = COUNT(0) FROM Address WITH (NOLOCK) WHERE IdCustomer = @IdCliente
 
--- 	IF @CONT > 0
--- 		BEGIN
--- 			UPDATE
--- 				Address
--- 			SET
--- 				PostalCode = @Cep,
--- 				PublicPlace = @Logradouro,
--- 				Number = @Numero,
--- 				Neighborhood = @Bairro,
--- 				Complement = @Complemento,
--- 				City = @Cidade,
--- 				FS = @Uf,
--- 				AddressDate = GETDATE()
--- 			WHERE
--- 				IdCustomer = @IdCliente
--- 		END
--- 	ELSE
--- 		BEGIN
--- 			INSERT INTO Address
--- 				(
--- 					IdCustomer,
--- 					PostalCode,
--- 					PublicPlace,
--- 					Number,
--- 					Neighborhood,
--- 					Complement,
--- 					City,
--- 					FS,
--- 					AddressDate
--- 				)
--- 			VALUES
--- 				(
--- 					@IdCliente,
--- 					@Cep,
--- 					@Logradouro,
--- 					@Numero,
--- 					@Bairro,
--- 					@Complemento,
--- 					@Cidade,
--- 					@Uf,
--- 					GETDATE()
--- 				)
--- 		END
--- 	COMMIT
--- 	END TRY
--- 	BEGIN CATCH
--- 		SELECT ERROR_MESSAGE() AS ErrorMessage
--- 		ROLLBACK TRANSACTION
--- 	END CATCH
--- END
--- GO
--- CREATE PROCEDURE sp_GravarContato
--- 	(
--- 		@IdCliente INT,
--- 		@IdAgente INT,
--- 		@Detalhe VARCHAR(8000)
--- 	)
--- AS
--- BEGIN
--- 	BEGIN TRANSACTION
--- 	BEGIN TRY
-
--- 		INSERT INTO Contact
--- 			(
--- 				IdCustomer,
--- 				IdAgent,
--- 				ContactDate,
--- 				Detail
--- 			)
--- 		VALUES
--- 			(
--- 				@IdCliente,
--- 				@IdAgente,
--- 				GETDATE(),
--- 				@Detalhe
--- 			)
--- 	COMMIT
--- 	END TRY
--- 	BEGIN CATCH
--- 		SELECT ERROR_MESSAGE() AS ErrorMessage
--- 		ROLLBACK TRANSACTION
--- 	END CATCH
--- END
--- GO
 -- CREATE PROCEDURE sp_ObterClientes
 -- AS
 -- BEGIN
