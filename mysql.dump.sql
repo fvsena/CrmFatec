@@ -293,6 +293,25 @@ BEGIN
 		IdCustomer = _IdCliente;
 END$$
 
+CREATE PROCEDURE getAddress
+	(
+		_IdCliente INT
+	)
+BEGIN
+	SELECT
+		PostalCode,
+		PublicPlace,
+		Number,
+		Neighborhood,
+		Complement,
+		City,
+		FS
+	FROM
+		Address
+	WHERE
+		IdCustomer = _IdCliente;
+END$$
+
 DELIMITER ;
 
 -- CREATE PROCEDURE sp_GravarTelefone
