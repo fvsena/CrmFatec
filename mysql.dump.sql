@@ -280,29 +280,21 @@ BEGIN
 		IdCustomer = _IdCliente;
 END$$
 
+CREATE PROCEDURE getTelephones
+	(
+		_IdCliente INT
+	)
+BEGIN
+	SELECT
+		PhoneNumber AS Telefone
+	FROM
+		Telephone
+	WHERE
+		IdCustomer = _IdCliente;
+END$$
+
 DELIMITER ;
 
-
-
--- GO
--- CREATE PROCEDURE sp_ObterCliente
--- 	(
--- 		@IdCliente INT
--- 	)
--- AS
--- BEGIN
--- 	SELECT
--- 		IdCustomer Codigo,
--- 		Name Nome,
--- 		Gender Genero,
--- 		DocumentNumber Documento,
--- 		BirthDate DataNascimento
--- 	FROM
--- 		Customer WITH (NOLOCK)
--- 	WHERE
--- 		IdCustomer = @IdCliente
--- END
--- GO
 -- CREATE PROCEDURE sp_GravarTelefone
 -- 	(
 -- 		@IdCliente INT,
@@ -332,49 +324,7 @@ DELIMITER ;
 -- 		)
 -- END
 -- GO
--- CREATE PROCEDURE sp_ObterTelefones
--- 	(
--- 		@IdCliente INT
--- 	)
--- AS
--- BEGIN
--- 	SELECT
--- 		PhoneNumber Telefone
--- 	FROM
--- 		Telephone WITH (NOLOCK)
--- 	WHERE
--- 		IdCustomer = @IdCliente
--- END
--- GO
--- CREATE PROCEDURE sp_ObterEndereco
--- 	(
--- 		@IdCliente INT
--- 	)
--- AS
--- BEGIN
--- 	SELECT
--- 		PostalCode,
--- 		PublicPlace,
--- 		Number,
--- 		Neighborhood,
--- 		Complement,
--- 		City,
--- 		FS
--- 	FROM
--- 		Address WITH (NOLOCK)
--- 	WHERE
--- 		IdCustomer = @IdCliente
--- END
--- GO
--- CREATE PROCEDURE sp_ObterGrupoOcorrencia
--- AS
--- BEGIN
--- 	SELECT
--- 		Name Grupo,
--- 		IdSubjectGroup IdGrupo
--- 	FROM
--- 		SubjectGroup WITH (NOLOCK)
--- END
+
 -- GO
 -- CREATE PROCEDURE sp_ObterSubGrupoOcorrencia
 -- 	(
