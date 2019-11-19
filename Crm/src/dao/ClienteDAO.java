@@ -12,7 +12,7 @@ import model.Cliente;
 
 public class ClienteDAO {
 	public Cliente gravarCliente(Cliente c) {
-		String sql = "call sp_GravarCliente (?, ?, ?, ?, ?)";
+		String sql = "call saveCustomer (?, ?, ?, ?, ?)";
 		try {
 			Connection conn = ConnectionManager.getInstance().getConnection();
 			CallableStatement statement = conn.prepareCall(sql);
@@ -48,7 +48,7 @@ public class ClienteDAO {
 		List<Cliente> clientes = new ArrayList<Cliente>();
 		try {
 			Connection conn = ConnectionManager.getInstance().getConnection();
-			CallableStatement statement = conn.prepareCall("call sp_ObterClientes()");
+			CallableStatement statement = conn.prepareCall("call getCustomers()");
 			ResultSet rs = statement.executeQuery();
 			while(rs.next()) {
 				c = new Cliente();
