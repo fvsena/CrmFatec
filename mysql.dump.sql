@@ -260,41 +260,30 @@ BEGIN
         (_IdCliente, _IdAgente, NOW(), _Detalhe);
 END$$
 
+
+CREATE PROCEDURE getContacts
+	(
+		_IdCliente INT
+	)
+BEGIN
+	SELECT
+		IdContact,
+		IdCustomer,
+		Agent.IdAgent,
+		Agent.Name,
+		ContactDate,
+		Detail
+	FROM
+		Contact
+	INNER JOIN Agent ON Contact.IdAgent = Agent.IdAgent
+	WHERE
+		IdCustomer = _IdCliente;
+END$$
+
 DELIMITER ;
 
 
--- CREATE PROCEDURE sp_ObterClientes
--- AS
--- BEGIN
--- 	SELECT
--- 		IdCustomer Codigo,
--- 		Name Nome,
--- 		Gender Genero,
--- 		DocumentNumber Documento,
--- 		BirthDate DataNascimento
--- 	FROM
--- 		Customer WITH (NOLOCK)
--- END
--- GO
--- CREATE PROCEDURE sp_ObterContatos	
--- 	(
--- 		@IdCliente INT
--- 	)
--- AS
--- BEGIN
--- 	SELECT
--- 		IdContact,
--- 		IdCustomer,
--- 		Agent.IdAgent,
--- 		Agent.Name,
--- 		ContactDate,
--- 		Detail
--- 	FROM
--- 		Contact WITH (NOLOCK)
--- 	INNER JOIN Agent WITH (NOLOCK) ON Contact.IdAgent = Agent.IdAgent
--- 	WHERE
--- 		IdCustomer = @IdCliente
--- END
+
 -- GO
 -- CREATE PROCEDURE sp_ObterCliente
 -- 	(
