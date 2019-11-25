@@ -166,6 +166,12 @@ CREATE PROCEDURE saveCustomer(
         _id INT
     )
 BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'An error has occurred, operation rollbacked and the stored procedure was terminated';
+    END;
+    START TRANSACTION;
     IF _id  IS NULL THEN
         INSERT INTO Customer
             ( Name, Gender, DocumentNumber, BirthDate, CustomerDate)
@@ -175,6 +181,7 @@ BEGIN
         UPDATE Customer SET Name = _name, Gender = _gender, DocumentNumber = _document, 
         BirthDate = _birthDate, CustomerDate = now() where IdCustomer = _id;
     END IF;
+    COMMIT;
 END$$
 
 CREATE PROCEDURE saveAddress (
@@ -189,6 +196,12 @@ CREATE PROCEDURE saveAddress (
 )
 BEGIN
     DECLARE total INT;
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'An error has occurred, operation rollbacked and the stored procedure was terminated';
+    END;
+    START TRANSACTION;
     SELECT COUNT(IdAddress) INTO total FROM Address WHERE IdCustomer = _idCustomer;
     IF total > 0 THEN
         UPDATE Address SET
@@ -224,6 +237,7 @@ BEGIN
                     NOW()
                 );
     END IF;
+    COMMIT;
 END$$
 
 CREATE PROCEDURE validateLogin (
@@ -234,7 +248,6 @@ BEGIN
     SELECT IdAgent, Name FROM Agent WHERE login = _login AND password = _password;
 END$$
 
-DELIMITER $$
 CREATE PROCEDURE getCustomers()
 BEGIN
 	SELECT
@@ -254,10 +267,17 @@ CREATE PROCEDURE saveContact
 		_Detalhe TEXT
 	)
 BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'An error has occurred, operation rollbacked and the stored procedure was terminated';
+    END;
+    START TRANSACTION;
     INSERT INTO Contact
         (IdCustomer, IdAgent, ContactDate, Detail)
     VALUES
         (_IdCliente, _IdAgente, NOW(), _Detalhe);
+    COMMIT;
 END$$
 
 
@@ -312,7 +332,7 @@ BEGIN
 		IdCustomer = _IdCliente;
 END$$
 
-CREATE PROCEDURE getGroupOcorrence()
+CREATE PROCEDURE getGroupOccurrences()
 BEGIN
 	SELECT
 		Name AS Grupo,
@@ -321,334 +341,247 @@ BEGIN
 		SubjectGroup;
 END$$
 
+
+CREATE PROCEDURE getSubGroupOccurrences
+ 	(
+ 		_IdGrupo INT
+ 	)
+ BEGIN
+ 	SELECT
+ 		Name SubGrupo,
+ 		IdSubjectSubGroup IdSubGrupo
+ 	FROM
+ 		SubjectSubGroup
+ 	WHERE
+ 		IdSubjectGroup = _IdGrupo;
+ END$$
+
+ CREATE PROCEDURE getOccurrenceDetails
+ 	(
+ 		_IdGrupo INT,
+ 		_IdSubGrupo INT
+ 	)
+ BEGIN
+ 	SELECT
+ 		Name Detalhe,
+ 		IdSubjectDetail IdDetalhe
+ 	FROM
+ 		SubjectDetail
+ 	WHERE
+ 		IdSubjectGroup = _IdGrupo
+ 		AND IdSubjectSubGroup = _IdSubGrupo;
+ END$$
+
+CREATE PROCEDURE saveGroupOccurence
+	(
+		_Group VARCHAR(50)
+	)
+BEGIN
+	DECLARE _COUNT INT;
+	SELECT COUNT(Name) INTO _COUNT FROM SubjectGroup  WHERE Name = _Group;
+
+	IF _COUNT <= 0 THEN
+	    INSERT INTO SubjectGroup (Name)	VALUES (_Group);
+    END IF;
+
+END$$
+
+CREATE PROCEDURE saveSubGroupOccurrence
+	(
+		_Grupo INT,
+		_SubGrupo VARCHAR(50)
+	)
+BEGIN
+	DECLARE _CONT INT;
+    DECLARE _CodigoSubGrupo INT;
+	SELECT _CONT = COUNT(Name) FROM SubjectSubGroup WHERE IdSubjectGroup = _Grupo AND Name = _SubGrupo;
+
+	IF _CONT <= 0 THEN
+        SELECT COALESCE(MAX(IdSubjectSubGroup),0)+1 INTO _CodigoSubGrupo FROM SubjectSubGroup WHERE IdSubjectGroup = _Grupo;
+
+        INSERT INTO SubjectSubGroup
+            (IdSubjectSubGroup, IdSubjectGroup, Name)
+        VALUES
+            (_CodigoSubGrupo,_Grupo,_SubGrupo);
+    END IF;
+END$$
+
+CREATE PROCEDURE saveOccurenceDetails
+	(
+		_Grupo INT,
+		_SubGrupo INT,
+		_Detalhe VARCHAR(100)
+	)
+BEGIN
+	DECLARE _CONT INT;
+	DECLARE _CodigoDetalhe INT;
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'An error has occurred, operation rollbacked and the stored procedure was terminated';
+    END;
+    START TRANSACTION;
+	SELECT COUNT(Name) INTO _CONT FROM SubjectDetail WHERE IdSubjectGroup = _Grupo AND IdSubjectSubGroup = _SubGrupo AND Name = _Detalhe;
+
+	IF _CONT <= 0 THEN
+        SELECT COALESCE(MAX(IdSubjectDetail),0)+1 INTO _CodigoDetalhe FROM SubjectDetail WHERE IdSubjectGroup = _Grupo AND IdSubjectSubGroup = _SubGrupo;
+        
+        INSERT INTO SubjectDetail
+            (IdSubjectGroup, IdSubjectSubGroup, IdSubjectDetail, Name)
+        VALUES
+            ( _Grupo, _SubGrupo, _CodigoDetalhe, _Detalhe );
+	END IF;
+    COMMIT;
+END$$
+
+CREATE PROCEDURE saveOccurence
+	(
+		_IdCliente INT,
+		_IdAgente INT,
+		_CodigoGrupo INT,
+		_CodigoSubGrupo INT,
+		_CodigoDetalhe INT,
+		_Mensagem VARCHAR(255)
+	)
+        BEGIN
+			DECLARE _IdOcorrencia INT;
+
+			INSERT INTO Occurrence
+				(
+					IdCustomer,
+					IdAgent,
+					OccurrenceDate,
+					IdSubjectGroup,
+					IdSubjectSubGroup,
+					IdSubjectDetail,
+					IdOccurrenceStatus
+				)
+			VALUES
+				(_IdCliente, _IdAgente, GETDATE(), _CodigoGrupo, _CodigoSubGrupo, _CodigoDetalhe, 1);
+
+			SET _IdOcorrencia = LAST_INSERT_ID();
+
+			INSERT INTO OccurrenceUpdate
+				(IdOccurrenceUpdateType, IdOccurrence, IdAgent, UpdateDate, UpdateMessage)
+			VALUES
+				(1, _IdOcorrencia, _IdAgente,GETDATE(),_Mensagem);	
+END$$
+
+CREATE PROCEDURE getOccurrences
+	(
+		_Quantidade INT
+	)
+BEGIN
+    IF _Quantidade IS NULL THEN
+        SET _Quantidade = 10;
+    END IF;
+	SELECT _Quantidade,
+		Occurrence.IdOccurrence AS `IdOcorrencia`,
+		Occurrence.IdCustomer AS `IdCliente`,
+		Occurrence.OccurrenceDate AS `DataAbertura`,
+		Customer.Name AS `Cliente`,
+		Agent.Name AS `Agente`,
+		SubjectGroup.Name AS `Grupo`,
+		SubjectSubGroup.Name AS `SubGrupo`,
+		SubjectDetail.Name AS `Detalhe`,
+		OccurrenceUpdate.UpdateMessage AS `UltimaAtualizaca`
+	FROM
+		Occurrence
+	INNER JOIN Agent ON Occurrence.IdAgent = Agent.IdAgent
+	INNER JOIN Customer ON Occurrence.IdCustomer = Customer.IdCustomer
+	INNER JOIN SubjectGroup ON Occurrence.IdSubjectGroup = SubjectGroup.IdSubjectGroup
+	INNER JOIN SubjectSubGroup ON Occurrence.IdSubjectGroup = SubjectSubGroup.IdSubjectGroup AND Occurrence.IdSubjectSubGroup = SubjectSubGroup.IdSubjectSubGroup
+	INNER JOIN SubjectDetail ON Occurrence.IdSubjectGroup = SubjectDetail.IdSubjectGroup AND Occurrence.IdSubjectSubGroup = SubjectDetail.IdSubjectSubGroup AND Occurrence.IdSubjectDetail = SubjectDetail.IdSubjectDetail
+	INNER JOIN
+		(
+			SELECT
+				MAX(IdOccurrenceUpdate) IdOccurrenceUpdate,
+				OccurrenceUpdate.IdOccurrence IdOccurrence
+			FROM
+				OccurrenceUpdate
+			GROUP BY
+				OccurrenceUpdate.IdOccurrence
+		) UPDATES ON UPDATES.IdOccurrence = Occurrence.IdOccurrence
+	INNER JOIN OccurrenceUpdate ON UPDATES.IdOccurrenceUpdate = OccurrenceUpdate.IdOccurrenceUpdate
+	ORDER BY
+		Occurrence.OccurrenceDate DESC LIMIT _Quantidade;
+END$$
+
+CREATE PROCEDURE findOccurences
+	(
+		_Codigo INT
+	)
+BEGIN
+	SELECT
+		Occurrence.IdOccurrence AS `IdOcorrencia`,
+		Occurrence.IdCustomer AS `IdCliente`,
+		Occurrence.OccurrenceDate AS `DataAbertura`,
+		Customer.Name AS `Cliente`,
+		Agent.Name AS `Agente`,
+		SubjectGroup.Name AS `Grupo`,
+		SubjectSubGroup.Name AS `SubGrupo`,
+		SubjectDetail.Name AS `Detalhe`
+	FROM
+		Occurrence
+	INNER JOIN Agent ON Occurrence.IdAgent = Agent.IdAgent
+	INNER JOIN Customer ON Occurrence.IdCustomer = Customer.IdCustomer
+	INNER JOIN SubjectGroup ON Occurrence.IdSubjectGroup = SubjectGroup.IdSubjectGroup
+	INNER JOIN SubjectSubGroup ON Occurrence.IdSubjectGroup = SubjectSubGroup.IdSubjectGroup AND Occurrence.IdSubjectSubGroup = SubjectSubGroup.IdSubjectSubGroup
+	INNER JOIN SubjectDetail ON Occurrence.IdSubjectGroup = SubjectDetail.IdSubjectGroup AND Occurrence.IdSubjectSubGroup = SubjectDetail.IdSubjectSubGroup AND Occurrence.IdSubjectDetail = SubjectDetail.IdSubjectDetail
+	WHERE
+		Occurrence.IdOccurrence = _Codigo;
+
+	SELECT
+		OccurrenceUpdate.IdOccurrenceUpdate AS `IdAtualizacao`,
+		OccurrenceUpdate.UpdateDate AS `DataAtualizacao`,
+		OccurrenceUpdate.IdAgent AS `IdAgente`,
+		Agent.Name AS `Agente`,
+		OccurrenceUpdateType.Name AS `TipoAtualizacao`,
+		OccurrenceUpdate.UpdateMessage AS `Mensagem`
+	FROM
+		OccurrenceUpdate
+	INNER JOIN Agent ON OccurrenceUpdate.IdAgent = Agent.IdAgent
+	INNER JOIN OccurrenceUpdateType ON OccurrenceUpdate.IdOccurrenceUpdateType = OccurrenceUpdateType.IdOccurrenceUpdateType
+	WHERE
+		OccurrenceUpdate.IdOccurrence = _Codigo;
+END$$
+
+CREATE PROCEDURE saveUpdates
+	(
+		_IdOcorrencia INT,
+		_IdAgente INT,
+		_IdTipoAtualizacao INT,
+		_Mensagem VARCHAR(255)
+	)
+BEGIN
+    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+    BEGIN
+        ROLLBACK;
+        SELECT 'An error has occurred, operation rollbacked and the stored procedure was terminated';
+    END;
+    START TRANSACTION;
+        INSERT INTO OccurrenceUpdate
+            ( IdOccurrenceUpdateType, IdOccurrence, IdAgent, UpdateDate, UpdateMessage)
+        VALUES
+            (1, _IdOcorrencia, _IdAgente, NOW(), _Mensagem);
+    COMMIT;	
+END$$
+
+CREATE PROCEDURE savePhone
+	(
+		_IdCliente INT,
+		_Telefone VARCHAR(11)
+	)
+BEGIN
+	DECLARE _CONT INT;
+	SELECT COUNT(*) INTO _CONT FROM Telephone WHERE IdCustomer = _IdCliente AND PhoneNumber = _Telefone;
+
+	IF _CONT <= 0 THEN
+        INSERT INTO Telephone
+            (IdCustomer,PhoneNumber,Status)
+        VALUES
+            (_IdCliente,_Telefone,1);
+    END IF;
+END$$
+
 DELIMITER ;
-
--- CREATE PROCEDURE sp_GravarTelefone
--- 	(
--- 		@IdCliente INT,
--- 		@Telefone VARCHAR(11)
--- 	)
--- AS
--- BEGIN
--- 	DECLARE @CONT INT
--- 	SELECT @CONT = COUNT(0) FROM Telephone WITH (NOLOCK) WHERE IdCustomer = @IdCliente AND PhoneNumber = @Telefone
-
--- 	IF @CONT > 0
--- 		BEGIN
--- 			RETURN;
--- 		END
-
--- 	INSERT INTO Telephone
--- 		(
--- 			IdCustomer,
--- 			PhoneNumber,
--- 			Status
--- 		)
--- 	VALUES
--- 		(
--- 			@IdCliente,
--- 			@Telefone,
--- 			1
--- 		)
--- END
--- GO
-
--- GO
--- CREATE PROCEDURE sp_ObterSubGrupoOcorrencia
--- 	(
--- 		@IdGrupo INT
--- 	)
--- AS
--- BEGIN
--- 	SELECT
--- 		Name SubGrupo,
--- 		IdSubjectSubGroup IdSubGrupo
--- 	FROM
--- 		SubjectSubGroup WITH (NOLOCK)
--- 	WHERE
--- 		IdSubjectGroup = @IdGrupo
--- END
--- GO
--- CREATE PROCEDURE sp_ObterDetalheOcorrencia
--- 	(
--- 		@IdGrupo INT,
--- 		@IdSubGrupo INT
--- 	)
--- AS
--- BEGIN
--- 	SELECT
--- 		Name Detalhe,
--- 		IdSubjectDetail IdDetalhe
--- 	FROM
--- 		SubjectDetail WITH (NOLOCK)
--- 	WHERE
--- 		IdSubjectGroup = @IdGrupo
--- 		AND IdSubjectSubGroup = @IdSubGrupo
--- END
--- GO
--- CREATE PROCEDURE sp_GravarGrupoOcorrencia
--- 	(
--- 		@Grupo VARCHAR(50)
--- 	)
--- AS
--- BEGIN
--- 	DECLARE @CONT INT
--- 	SELECT @CONT = COUNT(Name) FROM SubjectGroup WITH (NOLOCK) WHERE Name = @Grupo
-
--- 	IF @CONT > 0
--- 		BEGIN
--- 			RETURN
--- 		END
-
--- 	INSERT INTO SubjectGroup
--- 		(
--- 			Name
--- 		)
--- 	VALUES
--- 		(
--- 			@Grupo
--- 		)
--- END
--- GO
--- CREATE PROCEDURE sp_GravarSubGrupoOcorrencia
--- 	(
--- 		@Grupo INT,
--- 		@SubGrupo VARCHAR(50)
--- 	)
--- AS
--- BEGIN
--- 	DECLARE @CONT INT
--- 	SELECT @CONT = COUNT(Name) FROM SubjectSubGroup WITH (NOLOCK) WHERE IdSubjectGroup = @Grupo AND Name = @SubGrupo
-
--- 	IF @CONT > 0
--- 		BEGIN
--- 			RETURN
--- 		END
-
--- 	DECLARE @CodigoSubGrupo INT
--- 	SELECT @CodigoSubGrupo = ISNULL(MAX(IdSubjectSubGroup),0)+1 FROM SubjectSubGroup WITH (NOLOCK) WHERE IdSubjectGroup = @Grupo
-
--- 	INSERT INTO SubjectSubGroup
--- 		(
--- 			IdSubjectSubGroup,
--- 			IdSubjectGroup,
--- 			Name
--- 		)
--- 	VALUES
--- 		(
--- 			@CodigoSubGrupo,
--- 			@Grupo,
--- 			@SubGrupo
--- 		)
--- END
--- GO
--- CREATE PROCEDURE sp_GravarDetalheOcorrencia
--- 	(
--- 		@Grupo INT,
--- 		@SubGrupo INT,
--- 		@Detalhe VARCHAR(100)
--- 	)
--- AS
--- BEGIN
--- 	DECLARE @CONT INT
--- 	SELECT @CONT = COUNT(Name) FROM SubjectDetail WITH (NOLOCK) WHERE IdSubjectGroup = @Grupo AND IdSubjectSubGroup = @SubGrupo AND Name = @Detalhe
-
--- 	IF @CONT > 0
--- 		BEGIN
--- 			RETURN
--- 		END
-
--- 	DECLARE @CodigoDetalhe INT
--- 	SELECT @CodigoDetalhe = ISNULL(MAX(IdSubjectDetail),0)+1 FROM SubjectDetail WITH (NOLOCK) WHERE IdSubjectGroup = @Grupo AND IdSubjectSubGroup = @SubGrupo
-	
--- 	INSERT INTO SubjectDetail
--- 		(
--- 			IdSubjectGroup,
--- 			IdSubjectSubGroup,
--- 			IdSubjectDetail,
--- 			Name
--- 		)
--- 	VALUES
--- 		(
--- 			@Grupo,
--- 			@SubGrupo,
--- 			@CodigoDetalhe,
--- 			@Detalhe
--- 		)
--- END
--- GO
--- CREATE PROCEDURE sp_GravarOcorrencia
--- 	(
--- 		@IdCliente INT,
--- 		@IdAgente INT,
--- 		@CodigoGrupo INT,
--- 		@CodigoSubGrupo INT,
--- 		@CodigoDetalhe INT,
--- 		@Mensagem VARCHAR(255)
--- 	)
--- AS
--- BEGIN
--- 	BEGIN TRY
--- 		BEGIN TRANSACTION
--- 			DECLARE @IdOcorrencia INT
--- 			INSERT INTO Occurrence
--- 				(
--- 					IdCustomer,
--- 					IdAgent,
--- 					OccurrenceDate,
--- 					IdSubjectGroup,
--- 					IdSubjectSubGroup,
--- 					IdSubjectDetail,
--- 					IdOccurrenceStatus
--- 				)
--- 			VALUES
--- 				(
--- 					@IdCliente,
--- 					@IdAgente,
--- 					GETDATE(),
--- 					@CodigoGrupo,
--- 					@CodigoSubGrupo,
--- 					@CodigoDetalhe,
--- 					1
--- 				)
-
--- 			SET @IdOcorrencia = SCOPE_IDENTITY()
-
--- 			INSERT INTO OccurrenceUpdate
--- 				(
--- 					IdOccurrenceUpdateType,
--- 					IdOccurrence,
--- 					IdAgent,
--- 					UpdateDate,
--- 					UpdateMessage
--- 				)
--- 			VALUES
--- 				(
--- 					1,
--- 					@IdOcorrencia,
--- 					@IdAgente,
--- 					GETDATE(),
--- 					@Mensagem
--- 				)
--- 		COMMIT
--- 	END TRY
--- 	BEGIN CATCH
--- 		ROLLBACK TRANSACTION
--- 		SELECT ERROR_MESSAGE() AS ErrorMessage
--- 	END CATCH
-	
--- END
--- GO
--- CREATE PROCEDURE sp_ObterOcorrencias
--- 	(
--- 		@Quantidade INT = 10
--- 	)
--- AS
--- BEGIN
--- 	SELECT TOP (@Quantidade)
--- 		Occurrence.IdOccurrence AS [IdOcorrencia],
--- 		Occurrence.IdCustomer AS [IdCliente],
--- 		Occurrence.OccurrenceDate AS [DataAbertura],
--- 		Customer.Name AS [Cliente],
--- 		Agent.Name AS [Agente],
--- 		SubjectGroup.Name AS [Grupo],
--- 		SubjectSubGroup.Name AS [SubGrupo],
--- 		SubjectDetail.Name AS [Detalhe],
--- 		OccurrenceUpdate.UpdateMessage AS [UltimaAtualizacao]
--- 	FROM
--- 		Occurrence WITH (NOLOCK)
--- 	INNER JOIN Agent WITH (NOLOCK) ON Occurrence.IdAgent = Agent.IdAgent
--- 	INNER JOIN Customer WITH (NOLOCK) ON Occurrence.IdCustomer = Customer.IdCustomer
--- 	INNER JOIN SubjectGroup WITH (NOLOCK) ON Occurrence.IdSubjectGroup = SubjectGroup.IdSubjectGroup
--- 	INNER JOIN SubjectSubGroup WITH (NOLOCK) ON Occurrence.IdSubjectGroup = SubjectSubGroup.IdSubjectGroup AND Occurrence.IdSubjectSubGroup = SubjectSubGroup.IdSubjectSubGroup
--- 	INNER JOIN SubjectDetail WITH (NOLOCK) ON Occurrence.IdSubjectGroup = SubjectDetail.IdSubjectGroup AND Occurrence.IdSubjectSubGroup = SubjectDetail.IdSubjectSubGroup AND Occurrence.IdSubjectDetail = SubjectDetail.IdSubjectDetail
--- 	INNER JOIN
--- 		(
--- 			SELECT
--- 				MAX(IdOccurrenceUpdate) IdOccurrenceUpdate,
--- 				OccurrenceUpdate.IdOccurrence IdOccurrence
--- 			FROM
--- 				OccurrenceUpdate WITH (NOLOCK)
--- 			GROUP BY
--- 				OccurrenceUpdate.IdOccurrence
--- 		) UPDATES ON UPDATES.IdOccurrence = Occurrence.IdOccurrence
--- 	INNER JOIN OccurrenceUpdate WITH (NOLOCK) ON UPDATES.IdOccurrenceUpdate = OccurrenceUpdate.IdOccurrenceUpdate
--- 	ORDER BY
--- 		Occurrence.OccurrenceDate DESC
--- END
--- GO
--- CREATE PROCEDURE sp_BuscarOcorrencia
--- 	(
--- 		@Codigo INT
--- 	)
--- AS
--- BEGIN
--- 	SELECT
--- 		Occurrence.IdOccurrence AS [IdOcorrencia],
--- 		Occurrence.IdCustomer AS [IdCliente],
--- 		Occurrence.OccurrenceDate AS [DataAbertura],
--- 		Customer.Name AS [Cliente],
--- 		Agent.Name AS [Agente],
--- 		SubjectGroup.Name AS [Grupo],
--- 		SubjectSubGroup.Name AS [SubGrupo],
--- 		SubjectDetail.Name AS [Detalhe]
--- 	FROM
--- 		Occurrence WITH (NOLOCK)
--- 	INNER JOIN Agent WITH (NOLOCK) ON Occurrence.IdAgent = Agent.IdAgent
--- 	INNER JOIN Customer WITH (NOLOCK) ON Occurrence.IdCustomer = Customer.IdCustomer
--- 	INNER JOIN SubjectGroup WITH (NOLOCK) ON Occurrence.IdSubjectGroup = SubjectGroup.IdSubjectGroup
--- 	INNER JOIN SubjectSubGroup WITH (NOLOCK) ON Occurrence.IdSubjectGroup = SubjectSubGroup.IdSubjectGroup AND Occurrence.IdSubjectSubGroup = SubjectSubGroup.IdSubjectSubGroup
--- 	INNER JOIN SubjectDetail WITH (NOLOCK) ON Occurrence.IdSubjectGroup = SubjectDetail.IdSubjectGroup AND Occurrence.IdSubjectSubGroup = SubjectDetail.IdSubjectSubGroup AND Occurrence.IdSubjectDetail = SubjectDetail.IdSubjectDetail
--- 	WHERE
--- 		Occurrence.IdOccurrence = @Codigo
-
--- 	SELECT
--- 		OccurrenceUpdate.IdOccurrenceUpdate AS [IdAtualizacao],
--- 		OccurrenceUpdate.UpdateDate AS [DataAtualizacao],
--- 		OccurrenceUpdate.IdAgent AS [IdAgente],
--- 		Agent.Name AS [Agente],
--- 		OccurrenceUpdateType.Name AS [TipoAtualizacao],
--- 		OccurrenceUpdate.UpdateMessage AS [Mensagem]
--- 	FROM
--- 		OccurrenceUpdate WITH (NOLOCK)
--- 	INNER JOIN Agent WITH (NOLOCK) ON OccurrenceUpdate.IdAgent = Agent.IdAgent
--- 	INNER JOIN OccurrenceUpdateType WITH (NOLOCK) ON OccurrenceUpdate.IdOccurrenceUpdateType = OccurrenceUpdateType.IdOccurrenceUpdateType
--- 	WHERE
--- 		OccurrenceUpdate.IdOccurrence = @Codigo
--- END
--- GO
--- CREATE PROCEDURE sp_GravarAtualizacao
--- 	(
--- 		@IdOcorrencia INT,
--- 		@IdAgente INT,
--- 		@IdTipoAtualizacao INT,
--- 		@Mensagem VARCHAR(255)
--- 	)
--- AS
--- BEGIN
--- 	BEGIN TRY
--- 		BEGIN TRANSACTION
--- 			INSERT INTO OccurrenceUpdate
--- 				(
--- 					IdOccurrenceUpdateType,
--- 					IdOccurrence,
--- 					IdAgent,
--- 					UpdateDate,
--- 					UpdateMessage
--- 				)
--- 			VALUES
--- 				(
--- 					1,
--- 					@IdOcorrencia,
--- 					@IdAgente,
--- 					GETDATE(),
--- 					@Mensagem
--- 				)
--- 		COMMIT
--- 	END TRY
--- 	BEGIN CATCH
--- 		ROLLBACK TRANSACTION
--- 		SELECT ERROR_MESSAGE() AS ErrorMessage
--- 	END CATCH
-	
--- END
