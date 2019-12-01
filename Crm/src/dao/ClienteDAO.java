@@ -69,7 +69,7 @@ public class ClienteDAO {
 		Cliente c = new Cliente();
 		try {
 			Connection conn = ConnectionManager.getInstance().getConnection();
-			CallableStatement statement = conn.prepareCall("call sp_ObterCliente (?)");
+			CallableStatement statement = conn.prepareCall("call getCustomer (?)");
 			statement.setInt(1, codigoCliente);
 			ResultSet rs = statement.executeQuery();
 			while(rs.next()) {
