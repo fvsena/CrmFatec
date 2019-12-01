@@ -394,11 +394,11 @@ CREATE PROCEDURE saveSubGroupOccurrence
 BEGIN
 	DECLARE _CONT INT;
     DECLARE _CodigoSubGrupo INT;
-	SELECT _CONT = COUNT(Name) FROM SubjectSubGroup WHERE IdSubjectGroup = _Grupo AND Name = _SubGrupo;
-
+	SELECT COUNT(Name) INTO _CONT FROM SubjectSubGroup WHERE IdSubjectGroup = _Grupo AND Name = _SubGrupo;
+	SELECT _CONT;
 	IF _CONT <= 0 THEN
         SELECT COALESCE(MAX(IdSubjectSubGroup),0)+1 INTO _CodigoSubGrupo FROM SubjectSubGroup WHERE IdSubjectGroup = _Grupo;
-
+		SELECT _CodigoSubGrupo;
         INSERT INTO SubjectSubGroup
             (IdSubjectSubGroup, IdSubjectGroup, Name)
         VALUES
@@ -583,5 +583,74 @@ BEGIN
             (_IdCliente,_Telefone,1);
     END IF;
 END$$
+
+CREATE PROCEDURE getCustomer
+	(
+		_idCliente INT
+	)
+BEGIN
+	SELECT
+		IdCustomer AS 'Codigo',
+		Name AS 'Nome',
+		Gender AS 'Genero',
+		DocumentNumber AS 'Documento',
+		BirthDate AS 'DataNascimento'
+	FROM
+		Customer
+	WHERE
+		IdCustomer = _idCliente;
+END$$
+
+CREATE PROCEDURE getTotalContactsByLocation
+ 	(
+ 		_start DATETIME,
+        _end DATETIME
+ 	)
+ BEGIN
+ 	SELECT
+		DATE_FORMAT(Contact.ContactDate,'%d/%m/%Y') AS 'Date',
+ 		Address.FS AS 'State',
+        Address.City AS 'City',
+        COUNT(FS) AS 'Total'
+ 	FROM
+ 		Contact
+	INNER JOIN Customer ON Contact.IdCustomer = Customer.IdCustomer
+    INNER JOIN Address ON Customer.IdCustomer = Address.IdCustomer
+ 	WHERE
+ 		Contact.ContactDate BETWEEN _start AND _end
+	GROUP BY
+		DATE_FORMAT(Contact.ContactDate,'%d/%m/%Y'),
+ 		FS,
+        City;
+ END$$
+
+DELIMITER $$
+CREATE PROCEDURE getContactReport
+ 	(
+ 		_start DATETIME,
+        _end DATETIME
+ 	)
+ BEGIN
+ 	SELECT
+		Contact.ContactDate AS 'Date',
+        Customer.Name AS 'Name',
+        Customer.DocumentNumber AS 'DocumentNumber',
+        Customer.Gender AS 'Gender',
+        Customer.BirthDate AS 'BirthDate',
+        Address.PublicPlace AS 'PublicPlace',
+        Address.Number AS 'Number',
+        Address.Neighborhood AS 'Neighborhood',
+ 		Address.FS AS 'State',
+        Address.City AS 'City',
+        Contact.Detail AS 'Detail',
+        Agent.Name AS 'Agent'
+ 	FROM
+ 		Contact
+	INNER JOIN Customer ON Contact.IdCustomer = Customer.IdCustomer
+    INNER JOIN Address ON Customer.IdCustomer = Address.IdCustomer
+    INNER JOIN Agent ON Contact.IdAgent = Agent.IdAgent
+ 	WHERE
+ 		Contact.ContactDate BETWEEN _start AND _end;
+ END$$
 
 DELIMITER ;
