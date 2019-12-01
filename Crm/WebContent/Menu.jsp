@@ -12,7 +12,7 @@
             <li class="nav-item"><a href="Endereco" class="navbar-brand">Endereço</a></li>
             <li class="nav-item"><a href="ListaContatos" class="navbar-brand">Contatos</a></li>
             <li class="nav-item"><a href="#" class="navbar-brand">Ocorrências</a></li>
-            <li class="nav-item"><a href="#" class="navbar-brand">Tipo Ocorrência</a></li>
+            <li class="nav-item"><a href="TipoOcorrencia" class="navbar-brand">Tipo Ocorrência</a></li>
         </ul>
     </div>
 </nav>
